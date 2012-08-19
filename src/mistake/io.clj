@@ -1,14 +1,14 @@
 (ns mistake.io
   (:require [net.cgrand.enlive-html :as h]
             [cheshire.core :as json])
-  (:import (org.pegdown PegDownProcessor)))
+  (:import (org.pegdown PegDownProcessor Extensions)))
 
 (defn read-file [^java.io.File f]
   (let [^String name (.getName f)]
     (cond
       (.endsWith name ".html") [name (h/html-resource f)]
       (.endsWith name ".json") [name (json/decode (slurp f) true)]
-      (.endsWith name ".md") [name (.markdownToHtml (PegDownProcessor.) (slurp f))]
+      (.endsWith name ".md") [name (.markdownToHtml (PegDownProcessor. (Extensions/ALL)) (slurp f))]
       :else nil
       )))
 

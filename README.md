@@ -1,12 +1,12 @@
 furry-wight
 ===========
 
-a static site generator.
+a static text media generator.
 
 TODOs
 -----
 
-1. support nested directories
+1. support nested directories **DONE**
 2. pluggable workflow
 3. permlinks
 4. rss/atom

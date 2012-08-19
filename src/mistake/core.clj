@@ -2,9 +2,9 @@
   (:use [mistake io render]))
 
 (def config
-  {:layout-dir "layouts/"
-   :site-dir "site/"
-   :public-dir "public/"
+  {:layouts-dir "layouts/"
+   :matters-dir "matters/"
+   :resources-dir "resources/"
    :posts-dir "posts/"
    :published-dir "published/"})
 
@@ -17,22 +17,41 @@
   [handler & [opts]]
   (fn [req]
     (let [config (:config req)]
-      (handler (assoc :val {})))))
+      (handler (assoc req :site {:time (java.util.Date.)})))))
 
 (defn prepare-templates
   [handler & [opts]]
   (fn [req]
     (let [config (:config req)]
       (handler
-        (assoc req :templates (into {} (map
+        (assoc req :layouts (into {} (map
                                 (fn [[k v]] [k (doc-template k v)])
-                                (doc-map (file-map (:template-dir config))))))))))
+                                (doc-map (file-map (:layouts-dir config))))))))))
 
-(defn process-site
+(defn process-matters
   [handler & [opts]]
   (fn [req]
     (let [config (:config req)]
-      (handler (assoc req :site-pages
+      (handler (assoc req :matters
                  (into {} (map (fn [[k v]] [k (doc-template k v)])
-                   (doc-map (file-map (:site-dir config))))))
+                   (doc-map (file-map (:matters-dir config))))))
         ))))
+
+;(defn process-pages
+;  [handler & [opts]]
+;  (fn [req]
+;    (let [config (:config req)
+;          post {:url (make-url doc)
+;                :date (make-date doc)
+;                :id (make-id doc)
+;                :categories (make-categories doc)
+;                :tags (make-tags doc)
+;                :content (make-content doc)}]
+;      (handler req))))
+;
+;(defn generate-posts
+;  [handler & [opts]]
+;  (fn [req]
+;    (let [config (:config req)]
+;      ()
+;      (handler req))))
