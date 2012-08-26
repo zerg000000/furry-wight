@@ -1,34 +1,31 @@
 (ns mistake.io
   (:require [net.cgrand.enlive-html :as h]
-            [cheshire.core :as json])
+            [cheshire.core :as json]
+            [clj-time.format :as tformat])
   (:import (org.pegdown PegDownProcessor Extensions)))
 
 (defn read-file [^java.io.File f]
-  (let [^String name (.getName f)]
+  (let [^String name (.getPath f)]
     (cond
       (.endsWith name ".html") [name (h/html-resource f)]
-      (.endsWith name ".json") [name (json/decode (slurp f) true)]
+      (.endsWith name ".json") [name (json/decode (slurp f) false)]
       (.endsWith name ".md") [name (.markdownToHtml (PegDownProcessor. (Extensions/ALL)) (slurp f))]
+      (.endsWith name ".mustache") [name (slurp f)]
       :else nil
       )))
 
-(defn file-map [dir & recursive]
+(defn file-map [dir]
   (into {}
-    (filter identity
-      (map (fn [^java.io.File f]
-             (if (not (.isDirectory f))
-               (read-file f)))
-        (file-seq (clojure.java.io/file dir))))))
+    (pmap read-file
+      (remove #(.isDirectory %) (file-seq (clojure.java.io/file dir))))))
 
 (defn doc-map [files]
   (into {}
-    (filter identity
-      (map (fn [[^String key value]]
-             (let [meta-file (str key ".json")
-                   doc-file (get (.split key ".json") 0)]
-               (cond
-                 (get files meta-file) [key {:meta (get files meta-file) :content value}]
-                 (and (.endsWith key ".json")
-                   (get files doc-file)) nil
-                 :else [key value]))) files)
-      )))
+    (pmap (fn [[^String key value]]
+            [key {:meta (merge {:filename key
+                                :id ""}
+                          (get files (str key ".json")))
+                  :content value}]) (remove #(.endsWith (first %) ".json") files))))
+
+(defn doc-seq [dir]
+  (-> dir file-map doc-map))
