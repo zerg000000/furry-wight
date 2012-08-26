@@ -6,6 +6,7 @@
 (defn mustache-template [doc]
   (fn [data] (m/render (:content doc) (merge (:meta doc) data)))
   )
+
 (defn doc-template [^String name doc]
   (cond
     (.endsWith name ".html") (e/enlive-template doc)

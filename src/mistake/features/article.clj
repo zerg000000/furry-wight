@@ -1,7 +1,7 @@
 (ns mistake.features.article
   (use [mistake.io :only (doc-seq)]))
 
-(defn title-id [^String title] (.replace (.toLowerCase title) " " "-"))
+(defn title-id [^String title] (if title (.replace (.toLowerCase title) " " "-")))
 
 (defn generate-articles [articles layouts snippets config]
   (pmap
@@ -14,7 +14,6 @@
           {:content (:content article)
            :art-next-link "not yet implement"
            :art-prev-link "not yet implement"})]
-        (println render-context)
         (spit (str outdir outname ".html")
           ((get layouts layout-name) render-context))
         )) articles))
