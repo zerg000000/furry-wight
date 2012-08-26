@@ -1,7 +1,7 @@
 (ns mistake.features.config)
 
 (defn publish-date-sort [articles]
-  (reverse (sort-by (fn [article] (get-in article [:meta "publish-date"])) (vals articles))))
+  (reverse (sort-by (fn [article] (get-in article [:meta :publish-date ])) (vals articles))))
 
 (def config
   {:config {:dir {:layouts-dir "layouts/"

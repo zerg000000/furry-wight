@@ -8,7 +8,7 @@
   (let [^String name (.getPath f)]
     (cond
       (.endsWith name ".html") [name (h/html-resource f)]
-      (.endsWith name ".json") [name (json/decode (slurp f) false)]
+      (.endsWith name ".json") [name (json/decode (slurp f) true)]
       (.endsWith name ".md") [name (.markdownToHtml (PegDownProcessor. (Extensions/ALL)) (slurp f))]
       (.endsWith name ".mustache") [name (slurp f)]
       :else nil
@@ -22,8 +22,7 @@
 (defn doc-map [files]
   (into {}
     (pmap (fn [[^String key value]]
-            [key {:meta (merge {:filename key
-                                :id ""}
+            [key {:meta (merge {:filename key}
                           (get files (str key ".json")))
                   :content value}]) (remove #(.endsWith (first %) ".json") files))))
 
